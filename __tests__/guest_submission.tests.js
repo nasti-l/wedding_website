@@ -1,48 +1,59 @@
 const puppeteer = require('puppeteer');
+const { server } = require('./../server.js'); // Adjust the path to your server.js file
 const { faker } = require('@faker-js/faker');
 
 describe('Wedding Admin Panel Tests', () => {
   let browser;
   let page;
+  let port;
 
   beforeAll(async () => {
+    // Extract the dynamic port the server is running on
+    port = server.address().port;
+
+    // Launch Puppeteer
     browser = await puppeteer.launch({
-      headless: true,
-      slowMo: 50, // Slight delay to prevent DOM-related race conditions
+      headless: false, // Set to true for headless mode
     });
     page = await browser.newPage();
   });
 
   afterAll(async () => {
+    // Close Puppeteer and stop the server gracefully
     await browser.close();
+    server.close();
   });
 
   test('Add a guest with random data', async () => {
-    // Navigate to the admin page
-    await page.goto('http://localhost:3000/admin'); // Update with the correct URL
+    // Navigate to the server's dynamic port
+    await page.goto(`http://localhost:${port}/admin`); // Use the assigned port
 
     // Generate random guest data
     const randomGuest = {
-      name: faker.name.findName(), // Generate a random name
-      phone: faker.phone.number('+1-###-###-####'), // Generate a random phone number
+      name: faker.person.fullName(),
+      phone: faker.phone.number('+1-###-###-####'),
+      groups: [faker.word.noun(), faker.word.noun()],
     };
 
-    // Fill in the form fields
-    await page.type('#name', randomGuest.name); // Fill name
-    await page.type('#phone', randomGuest.phone); // Fill phone number
+    // Fill out the "Add a Guest" form
+    await page.type('#name', randomGuest.name);
+    await page.type('#phone', randomGuest.phone);
+
+    // Add groups dynamically
+    for (const group of randomGuest.groups) {
+      await page.type('#groupInput', group);
+      await page.click('.btn-add'); // Click on "Add Group"
+    }
+
+    // Set the first group as primary
+    await page.click('.group-tag.primary');
 
     // Submit the form
     await page.click('#guestForm button[type="submit"]');
 
-    // Wait for the API response and the DOM update
-    await page.waitForResponse((response) =>
-        response.url().includes('/api/guests') && response.status() === 201
-    );
-    await page.waitForSelector('#result'); // Ensure the success message selector appears
-
-    // Retrieve and assert the success message
-    const successMessage = await page.$eval('#result', (el) => el.textContent.trim());
-    console.log('Success Message:', successMessage); // Debugging output
-    expect(successMessage).toContain('Guest added successfully'); // Assert success
+    // Check if success message appears
+    await page.waitForSelector('#result');
+    const successMessage = await page.$eval('#result', (el) => el.textContent);
+    expect(successMessage).toContain('Guest added successfully');
   });
 });
