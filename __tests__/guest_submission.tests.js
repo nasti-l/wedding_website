@@ -20,7 +20,7 @@ describe('Wedding Admin Panel Tests', () => {
 
   afterAll(async () => {
     // Close Puppeteer and stop the server gracefully
-    await browser.close();
+    // await browser.close();
     server.close();
   });
 
