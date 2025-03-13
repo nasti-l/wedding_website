@@ -5,6 +5,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const path = require('path');
 
 const app = express();
+app.use(express.static('./'));
 
 // Middleware to parse JSON payloads
 app.use(bodyParser.json());
