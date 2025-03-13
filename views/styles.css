@@ -106,3 +106,46 @@ h4 {
 .status.Invited {
     color: green;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+th, td {
+    padding: 10px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+tr.primary-group {
+    background-color: rgba(255, 223, 186, 0.2); /* Light tint for primary group */
+}
+
+.group-tag {
+    padding: 4px 8px;
+    margin-right: 5px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.primary-group-tag {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.delete-btn {
+    padding: 5px 10px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+}

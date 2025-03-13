@@ -58,26 +58,51 @@ function updateGroupDisplay() {
   });
 }
 
+const groupColors = {}; // Store unique colors for each group
+
+const getGroupColor = (group) => {
+  if (!groupColors[group]) {
+    // Generate a random pastel color
+    groupColors[group] = `hsl(${Math.random() * 360}, 70%, 80%)`;
+  }
+  return groupColors[group];
+};
+
 const renderGuestList = async () => {
-  const response = await fetch('/api/guests'); // Replace with your actual endpoint
+  const response = await fetch('/api/guests');
   const guests = await response.json();
 
-  const tableBody = document.getElementById("guestList"); // Replace with your table's ID
-  tableBody.innerHTML = ""; // Clear existing rows
+  const tableBody = document.getElementById("guestList");
+  tableBody.innerHTML = "";
 
   guests.forEach(guest => {
+    const primaryGroup = guest.primaryGroup;
+    const groups = guest.groups;
+
+    // Move primary group to the first position
+    const sortedGroups = [primaryGroup, ...groups.filter(g => g !== primaryGroup)];
+
+    const groupHTML = sortedGroups.map(group => {
+      const color = getGroupColor(group);
+      const isPrimary = group === primaryGroup ? 'primary-group-tag' : '';
+      return `<span class="group-tag ${isPrimary}" style="background-color: ${color};">${group}</span>`;
+    }).join(" ");
+
     const row = document.createElement("tr");
+    if (primaryGroup) row.classList.add('primary-group');
+
     row.innerHTML = `
       <td>${guest.id}</td>
       <td>${guest.name}</td>
       <td>${guest.phone}</td>
-      <td>${guest.groups.join(", ")}</td>
+      <td>${groupHTML}</td>
       <td>${guest.status}</td>
-      <td><button onclick="deleteGuest(${guest.id})">Delete</button></td>
+      <td><button class="delete-btn" onclick="deleteGuest(${guest.id})">Delete</button></td>
     `;
     tableBody.appendChild(row);
   });
 };
+
 
 const deleteGuest = async (id) => {
   await fetch(`/api/guests/${id}`, { method: 'DELETE' });
