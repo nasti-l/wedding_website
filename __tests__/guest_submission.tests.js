@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { server } = require('./../server.js'); // Adjust the path to your server.js file
+const { server } = require('./../app.js'); // Adjust the path to your server.js file
 const { faker } = require('@faker-js/faker');
 
 describe('Wedding Admin Panel Tests', () => {
