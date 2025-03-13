@@ -62,18 +62,23 @@ const groupColors = {}; // Store unique colors for each group
 
 const getGroupColor = (group) => {
   if (!groupColors[group]) {
-    // Generate a random pastel color
-    groupColors[group] = `hsl(${Math.random() * 360}, 70%, 80%)`;
+    // Generate a pastel color
+    const hue = Math.random() * 360;
+    groupColors[group] = `hsl(${hue}, 70%, 70%)`;
   }
   return groupColors[group];
+};
+
+const getTransparentColor = (color) => {
+  return color.replace('hsl', 'hsla').replace(')', ', 0.15)');
 };
 
 const renderGuestList = async () => {
   const response = await fetch('/api/guests');
   const guests = await response.json();
 
-  const tableBody = document.getElementById("guestList");
-  tableBody.innerHTML = "";
+  const guestList = document.getElementById("guestList");
+  guestList.innerHTML = ""; // Clear the list before re-rendering
 
   guests.forEach(guest => {
     const primaryGroup = guest.primaryGroup;
@@ -85,11 +90,16 @@ const renderGuestList = async () => {
     const groupHTML = sortedGroups.map(group => {
       const color = getGroupColor(group);
       const isPrimary = group === primaryGroup ? 'primary-group-tag' : '';
-      return `<span class="group-tag ${isPrimary}" style="background-color: ${color};">${group}</span>`;
+      const backgroundColor = group === primaryGroup
+          ? 'transparent'
+          : color;
+
+      return `<span class="group-tag ${isPrimary}" style="background-color: ${backgroundColor};">${group}</span>`;
     }).join(" ");
 
     const row = document.createElement("tr");
-    if (primaryGroup) row.classList.add('primary-group');
+    const primaryColor = getGroupColor(primaryGroup);
+    row.style.backgroundColor = getTransparentColor(primaryColor); // Transparent row background
 
     row.innerHTML = `
       <td>${guest.id}</td>
@@ -99,9 +109,11 @@ const renderGuestList = async () => {
       <td>${guest.status}</td>
       <td><button class="delete-btn" onclick="deleteGuest(${guest.id})">Delete</button></td>
     `;
-    tableBody.appendChild(row);
+    guestList.appendChild(row);
   });
 };
+
+
 
 
 const deleteGuest = async (id) => {
