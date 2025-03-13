@@ -22,21 +22,20 @@ app.get('/', (req, res) => {
 
 // API to add a guest to the list
 app.post('/api/guests', (req, res) => {
-  const { name, email, phone } = req.body;
+  const { name, phone } = req.body;
 
   // Basic validation
-  if (!name || !email || !phone) {
-    return res.status(400).send({ error: 'Name, email, and phone are required!' });
+  if (!name || !phone) {
+    return res.status(400).send({ error: 'Name and phone are required!' });
   }
 
   // Add the guest to the list
-  const newGuest = { id: guestList.length + 1, name, email, phone };
+  const newGuest = { id: guestList.length + 1, name, phone };
   guestList.push(newGuest);
 
   console.log(`Guest added: ${JSON.stringify(newGuest)}`);
-  res.status(201).send({ message: 'Guest added successfully!', guest: newGuest });
+  res.status(201).send({ message: 'Guest added successfully', guest: newGuest });
 });
-
 // API to retrieve the current guest list (for testing purpose)
 app.get('/api/guests', (req, res) => {
   res.send(guestList);
@@ -83,3 +82,5 @@ const gracefulShutdown = () => {
 // Listen for termination signals
 process.on('SIGINT', gracefulShutdown); // Handle Ctrl+C
 process.on('SIGTERM', gracefulShutdown); // Handle kill process
+
+module.exports = { server, app };
