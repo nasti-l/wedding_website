@@ -58,23 +58,67 @@ function updateGroupDisplay() {
   });
 }
 
-// Handle the guest form submission
+const renderGuestList = async () => {
+  const response = await fetch('/api/guests'); // Replace with your actual endpoint
+  const guests = await response.json();
+
+  const tableBody = document.getElementById("guestList"); // Replace with your table's ID
+  tableBody.innerHTML = ""; // Clear existing rows
+
+  guests.forEach(guest => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${guest.id}</td>
+      <td>${guest.name}</td>
+      <td>${guest.phone}</td>
+      <td>${guest.groups.join(", ")}</td>
+      <td>${guest.status}</td>
+      <td><button onclick="deleteGuest(${guest.id})">Delete</button></td>
+    `;
+    tableBody.appendChild(row);
+  });
+};
+
+const deleteGuest = async (id) => {
+  await fetch(`/api/guests/${id}`, { method: 'DELETE' });
+  renderGuestList(); // Refresh the list after deletion
+};
+
+
+
 document.getElementById("guestForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const name = document.getElementById("name").value;
   const phone = document.getElementById("phone").value;
 
-  const guest = { name, phone, groups, primaryGroup, status: "Not Invited" };
-  console.log("Guest added:", guest);
+  if (groups.length === 0) {
+    alert("At least one group is required.");
+    return;
+  }
 
-  // Clear form
+  const guest = { name, phone, groups, primaryGroup, status: "Not Invited" };
+
+  const response = await fetch('/api/guests', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(guest)
+  });
+
+  const result = await response.json();
+  console.log("Guest added:", result);
+
   document.getElementById("guestForm").reset();
   groups.length = 0;
   primaryGroup = null;
   updateGroupDisplay();
 
-  // Show success message
-  const resultElement = document.getElementById("result");
-  resultElement.textContent = "Guest added successfully!";
+  renderGuestList(); // Refresh the table after adding a guest
 });
+
+
+// Load the guest list when the page loads
+window.onload = renderGuestList;
+

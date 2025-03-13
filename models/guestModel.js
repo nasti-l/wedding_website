@@ -1,8 +1,15 @@
 // In-memory "guest list" storage
 let guestList = [];
 
-const addGuest = (name, phone) => {
-  const newGuest = { id: guestList.length + 1, name, phone };
+const addGuest = (name, phone, groups, primaryGroup) => {
+  const newGuest = {
+    id: guestList.length + 1,
+    name,
+    phone,
+    groups,
+    primaryGroup,
+    status: "Not Invited",
+  };
   guestList.push(newGuest);
   return newGuest;
 };

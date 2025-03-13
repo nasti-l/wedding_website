@@ -2,14 +2,14 @@ const { addGuest, getAllGuests, deleteGuestById } = require('../models/guestMode
 
 // Business logic for adding a guest
 const createGuest = (req, res) => {
-  const { name, phone } = req.body;
+  const { name, phone, groups, primaryGroup } = req.body;
 
   // Basic validation
-  if (!name || !phone) {
-    return res.status(400).send({ error: 'Name and phone are required!' });
+  if (!name || !phone || !groups || groups.length === 0) {
+    return res.status(400).send({ error: 'Name, phone, and at least one group are required!' });
   }
 
-  const newGuest = addGuest(name, phone);
+  const newGuest = addGuest(name, phone, groups, primaryGroup);
   console.log(`Guest added: ${JSON.stringify(newGuest)}`);
   res.status(201).send({ message: 'Guest added successfully', guest: newGuest });
 };
