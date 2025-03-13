@@ -65,11 +65,6 @@ document.getElementById("guestForm").addEventListener("submit", async (e) => {
   const name = document.getElementById("name").value;
   const phone = document.getElementById("phone").value;
 
-  if (!primaryGroup) {
-    alert("Please select a primary group.");
-    return;
-  }
-
   const guest = { name, phone, groups, primaryGroup, status: "Not Invited" };
   console.log("Guest added:", guest);
 
