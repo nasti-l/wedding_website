@@ -1,5 +1,7 @@
 const express = require('express');
 const { createGuest, getGuests, removeGuest } = require('./../controllers/guestController');
+const { createGroup, getGroups } = require("../controllers/groupController");
+
 
 const router = express.Router();
 
@@ -7,5 +9,8 @@ const router = express.Router();
 router.post('/', createGuest);  // Add a guest
 router.get('/', getGuests);     // Get all guests
 router.delete('/:id', removeGuest); // Delete a guest by ID
+
+router.post("/groups", createGroup);
+router.get("/groups", getGroups);
 
 module.exports = router;

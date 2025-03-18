@@ -1,52 +1,26 @@
-const { addGuest, getAllGuests, deleteGuestById } = require('../models/guestModel');
+const { addGuest, getAllGuests, deleteGuestById } = require("../models/guestModel");
 
-// Business logic for adding a guest
 const createGuest = async (req, res) => {
   try {
-    const { name, phone, groups, primaryGroup } = req.body;
+    const { name, phone, groupIds, primaryGroupId } = req.body;
 
-    // Detailed validation with specific error messages
-    if (!name) {
-      return res.status(400).json({ error: 'Name is required' });
+    if (!name) return res.status(400).json({ error: "Name is required" });
+    if (!phone) return res.status(400).json({ error: "Phone number is required" });
+    if (!groupIds || !Array.isArray(groupIds) || groupIds.length === 0) {
+      return res.status(400).json({ error: "At least one group must be specified" });
+    }
+    if (!primaryGroupId || !groupIds.includes(primaryGroupId)) {
+      return res.status(400).json({ error: "Primary group must be in group list" });
     }
 
-    if (!phone) {
-      return res.status(400).json({ error: 'Phone number is required' });
-    }
-
-    if (!groups || !Array.isArray(groups) || groups.length === 0) {
-      return res.status(400).json({ error: 'At least one group must be specified' });
-    }
-
-    if (primaryGroup && !groups.includes(primaryGroup)) {
-      return res.status(400).json({
-        error: 'Primary group must be included in the groups array',
-        groups: groups,
-        primaryGroup: primaryGroup
-      });
-    }
-
-    // Try to add the guest and handle errors properly
-    const newGuest = await addGuest(name, phone, groups, primaryGroup);
-
-    console.log(`Guest added: ${JSON.stringify(newGuest)}`);
-    return res.status(201).json({ message: 'Guest added successfully', guest: newGuest });
+    const newGuest = await addGuest(name, phone, groupIds, primaryGroupId);
+    return res.status(201).json({ message: "Guest added successfully", guest: newGuest });
   } catch (error) {
-    console.error('Error adding guest:', error);
-
-    if (error.code === "23505") {
-      return res.status(409).json({ error: "A guest with this phone number already exists" });
-    }
-
-    // Generic error if we don't recognize the specific error
-    return res.status(500).json({
-      error: 'Failed to add guest',
-      message: error.message || 'Unknown error'
-    });
+    console.error("Error adding guest:", error);
+    return res.status(500).json({ error: "Failed to add guest", message: error.message });
   }
 };
 
-// Business logic for getting all guests
 const getGuests = async (req, res) => {
   try {
     const guests = await getAllGuests();
@@ -57,14 +31,10 @@ const getGuests = async (req, res) => {
   }
 };
 
-// Business logic for deleting a guest by ID
 const removeGuest = async (req, res) => {
   try {
     const guestId = parseInt(req.params.id);
-
-    if (isNaN(guestId)) {
-      return res.status(400).json({ error: "Invalid guest ID" });
-    }
+    if (isNaN(guestId)) return res.status(400).json({ error: "Invalid guest ID" });
 
     const success = await deleteGuestById(guestId);
     if (success) {
