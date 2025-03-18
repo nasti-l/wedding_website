@@ -119,10 +119,6 @@ th, td {
     border-bottom: 1px solid #ddd;
 }
 
-.guest-row {
-    opacity: 0.9; /* Slight transparency */
-}
-
 .group-tag {
     padding: 5px 10px;
     margin: 2px;
@@ -134,10 +130,6 @@ th, td {
 .primary-group-tag {
     font-weight: bold;
     border: 1px solid white;
-}
-
-.transparent-row {
-    background-color: var(--row-color);
 }
 
 

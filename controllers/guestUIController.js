@@ -90,18 +90,13 @@ const renderGuestList = async () => {
     const groupHTML = sortedGroups.map(group => {
       const color = getGroupColor(group);
       const isPrimary = group === primaryGroup ? 'primary-group-tag' : '';
-      const backgroundColor = group === primaryGroup
-          ? 'transparent'
-          : color;
 
-      return `<span class="group-tag ${isPrimary}" style="background-color: ${backgroundColor};">${group}</span>`;
+      // Use the color for primary groups too, not transparent
+      return `<span class="group-tag ${isPrimary}" style="background-color: ${color};">${group}</span>`;
     }).join(" ");
 
     const row = document.createElement("tr");
-    const primaryColor = getGroupColor(primaryGroup);
-    row.style.backgroundColor = getTransparentColor(primaryColor); // Transparent row background
-
-    row.innerHTML = `
+    row.innerHTML = `        
       <td>${guest.id}</td>
       <td>${guest.name}</td>
       <td>${guest.phone}</td>
