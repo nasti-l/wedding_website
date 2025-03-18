@@ -145,7 +145,8 @@ document.getElementById("guestForm").addEventListener("submit", async (e) => {
   });
 
   const result = await response.json();
-  console.log("Guest added:", result);
+  const resultElement = document.getElementById("result");
+  resultElement.textContent = result.message;
 
   document.getElementById("guestForm").reset();
   groups.length = 0;
