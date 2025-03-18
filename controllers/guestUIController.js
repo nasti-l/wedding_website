@@ -80,9 +80,9 @@ const renderGuestList = async () => {
 
   const guestList = document.getElementById("guestList");
   guestList.innerHTML = ""; // Clear the list before re-rendering
-  // console.log(guests);
+  console.log(guests);
   guests.forEach(guest => {
-    const primaryGroup = guest.primaryGroup;
+    const primaryGroup = guest.primary_group;
     const groups = guest.groups;
 
     // Move primary group to the first position
