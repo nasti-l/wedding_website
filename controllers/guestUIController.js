@@ -59,18 +59,19 @@ function updateGroupDisplay() {
 }
 
 const groupColors = {}; // Store unique colors for each group
+const usedHues = []; // Store generated hues
 
 const getGroupColor = (group) => {
   if (!groupColors[group]) {
-    // Generate a pastel color
-    const hue = Math.random() * 360;
+    let hue;
+    do {
+      hue = Math.floor(Math.random() * 360);
+    } while (usedHues.some(prevHue => Math.abs(prevHue - hue) < 30)); // Ensure at least 30-degree difference
+
+    usedHues.push(hue); // Store the hue
     groupColors[group] = `hsl(${hue}, 70%, 70%)`;
   }
   return groupColors[group];
-};
-
-const getTransparentColor = (color) => {
-  return color.replace('hsl', 'hsla').replace(')', ', 0.15)');
 };
 
 const renderGuestList = async () => {
