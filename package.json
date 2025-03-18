@@ -11,8 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "@faker-js/faker": "^9.6.0",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "pg": "^8.14.1"
   },
   "devDependencies": {
     "faker": "^6.6.6",
@@ -26,6 +28,4 @@
       "**/?(*.)+(spec|test).[tj]s?(x)"
     ]
   }
-
-
 }

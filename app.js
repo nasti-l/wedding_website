@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const guestRoutes = require('./routes/guestRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const path = require('path');
+require("dotenv").config();
+
 
 const app = express();
 app.use(express.static('./'));

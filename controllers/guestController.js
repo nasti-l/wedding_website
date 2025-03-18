@@ -1,7 +1,7 @@
 const { addGuest, getAllGuests, deleteGuestById } = require('../models/guestModel');
 
 // Business logic for adding a guest
-const createGuest = (req, res) => {
+const createGuest = async (req, res) => {
   try {
     const { name, phone, groups, primaryGroup } = req.body;
 
@@ -26,21 +26,16 @@ const createGuest = (req, res) => {
       });
     }
 
-    // Try to add the guest and catch any errors from the addGuest function
-    const newGuest = addGuest(name, phone, groups, primaryGroup);
+    // Try to add the guest and handle errors properly
+    const newGuest = await addGuest(name, phone, groups, primaryGroup);
 
     console.log(`Guest added: ${JSON.stringify(newGuest)}`);
     return res.status(201).json({ message: 'Guest added successfully', guest: newGuest });
   } catch (error) {
     console.error('Error adding guest:', error);
 
-    // Provide specific error message based on error type
-    if (error.code === 'DUPLICATE_PHONE') {
-      return res.status(409).json({ error: 'A guest with this phone number already exists' });
-    } else if (error.code === 'INVALID_GROUP') {
-      return res.status(400).json({ error: `Invalid group: ${error.group}` });
-    } else if (error.code === 'DATABASE_ERROR') {
-      return res.status(500).json({ error: 'Database error occurred' });
+    if (error.code === "23505") {
+      return res.status(409).json({ error: "A guest with this phone number already exists" });
     }
 
     // Generic error if we don't recognize the specific error
@@ -52,18 +47,34 @@ const createGuest = (req, res) => {
 };
 
 // Business logic for getting all guests
-const getGuests = (req, res) => {
-  res.send(getAllGuests());
+const getGuests = async (req, res) => {
+  try {
+    const guests = await getAllGuests();
+    res.json(guests);
+  } catch (error) {
+    console.error("Error fetching guests:", error);
+    res.status(500).json({ error: "Failed to retrieve guests" });
+  }
 };
 
 // Business logic for deleting a guest by ID
-const removeGuest = (req, res) => {
-  const guestId = parseInt(req.params.id);
+const removeGuest = async (req, res) => {
+  try {
+    const guestId = parseInt(req.params.id);
 
-  if (deleteGuestById(guestId)) {
-    res.send({ message: 'Guest deleted successfully!' });
-  } else {
-    res.status(404).send({ error: 'Guest not found' });
+    if (isNaN(guestId)) {
+      return res.status(400).json({ error: "Invalid guest ID" });
+    }
+
+    const success = await deleteGuestById(guestId);
+    if (success) {
+      return res.json({ message: "Guest deleted successfully!" });
+    } else {
+      return res.status(404).json({ error: "Guest not found" });
+    }
+  } catch (error) {
+    console.error("Error deleting guest:", error);
+    return res.status(500).json({ error: "Failed to delete guest" });
   }
 };
 
