@@ -46,6 +46,17 @@ const toggleGroup = (groupName) => {
   updateGroupDisplay();
 };
 
+// Function to remove a group
+const removeGroup = (groupName) => {
+  if (groupName === primaryGroup) {
+    primaryGroup = selectedGroups.size > 1 ? [...selectedGroups].find(g => g !== groupName) : null;
+  }
+  selectedGroups.delete(groupName);
+  groups = groups.filter(g => g.name !== groupName);
+  delete groupColors[groupName];
+  updateGroupDisplay();
+};
+
 // Update the group display in the UI
 const updateGroupDisplay = () => {
   const groupsContainer = document.getElementById("groupsContainer");
@@ -76,12 +87,11 @@ const updateGroupDisplay = () => {
 
   // Display all groups except the primary group in container
   groups.forEach(group => {
-    if (group.name !== primaryGroup) { // Only add non-primary groups here
+    if (group.name !== primaryGroup) {
       const tag = document.createElement("span");
       const isSelected = selectedGroups.has(group.name);
       tag.className = `group-tag ${isSelected ? 'selected' : ''}`;
       tag.style.backgroundColor = group.color;
-      tag.textContent = group.name;
       tag.draggable = true;
       tag.onclick = () => toggleGroup(group.name);
 
@@ -89,6 +99,21 @@ const updateGroupDisplay = () => {
         e.dataTransfer.setData("text/plain", group.name);
         e.dataTransfer.dropEffect = "move";
       };
+
+      // Create the group name span
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = group.name;
+      tag.appendChild(nameSpan);
+
+      // Create the remove button
+      const removeBtn = document.createElement("span");
+      removeBtn.className = "remove-btn";
+      removeBtn.textContent = "×";
+      removeBtn.onclick = (e) => {
+        e.stopPropagation(); // Prevent triggering the toggle
+        removeGroup(group.name);
+      };
+      tag.appendChild(removeBtn);
 
       groupsContainer.appendChild(tag);
     }
@@ -126,7 +151,6 @@ const updateGroupDisplay = () => {
     }
   };
 };
-
 // Modified renderGuestList
 const renderGuestList = async () => {
   const response = await fetch('/api/guests');

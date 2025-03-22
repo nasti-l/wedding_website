@@ -72,7 +72,6 @@ h4 {
 .group-tag span {
     font-size: 0.8rem;
     color: white;
-    background: #ff6565;
     border-radius: 50%;
     padding: 0px 5px;
     margin-left: 5px;
@@ -135,13 +134,6 @@ th, td {
 .delete-btn:hover {
     background-color: #c0392b;
 }
-.group-tag {
-    padding: 4px 8px;
-    margin: 2px;
-    border-radius: 4px;
-    cursor: pointer;
-    display: inline-block;
-}
 
 .group-tag.selected {
     border: 2px solid #f9ff39;
@@ -180,4 +172,39 @@ th, td {
     width: calc(100% - 20px); /* Account for padding */
     text-align: center;
     margin: 0 auto;
+}
+.group-tag {
+    padding: 4px 8px;
+    margin: 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    position: relative; /* For positioning the X */
+}
+
+.group-tag .remove-btn {
+    display: none; /* Hidden by default */
+    position: absolute;
+    right: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #ff4444;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.group-tag:hover .remove-btn {
+    display: block; /* Show on hover */
+}
+
+/* Ensure primary tag in drop zone doesn’t show remove button */
+#primaryDropZone .group-tag .remove-btn {
+    display: none !important;
 }
