@@ -1,7 +1,7 @@
 let groups = [];
 let primaryGroup = null;
 let groupColors = {};
-let selectedGroups = new Set(); // Track selected groups
+let selectedGroups = new Set();
 
 // Fetch groups from the backend
 const loadGroups = async () => {
@@ -30,7 +30,6 @@ const addGroup = async () => {
   const newGroup = await response.json();
   groups.push(newGroup);
   groupColors[newGroup.name] = newGroup.color;
-  primaryGroup = primaryGroup || newGroup.name;
   updateGroupDisplay();
 };
 
@@ -38,10 +37,11 @@ const addGroup = async () => {
 const toggleGroup = (groupName) => {
   if (selectedGroups.has(groupName)) {
     selectedGroups.delete(groupName);
-    if (primaryGroup === groupName) primaryGroup = selectedGroups.size > 0 ? [...selectedGroups][0] : null;
+    if (primaryGroup === groupName) {
+      primaryGroup = selectedGroups.size > 0 ? [...selectedGroups][0] : null;
+    }
   } else {
     selectedGroups.add(groupName);
-    if (!primaryGroup) primaryGroup = groupName;
   }
   updateGroupDisplay();
 };
@@ -49,17 +49,82 @@ const toggleGroup = (groupName) => {
 // Update the group display in the UI
 const updateGroupDisplay = () => {
   const groupsContainer = document.getElementById("groupsContainer");
-  groupsContainer.innerHTML = "";
+  const primaryDropZone = document.getElementById("primaryDropZone");
 
+  groupsContainer.innerHTML = "";
+  primaryDropZone.innerHTML = "";
+
+  // Display primary group in drop zone if exists
+  if (primaryGroup) {
+    const primaryTag = document.createElement("span");
+    primaryTag.className = "group-tag primary selected";
+    primaryTag.style.backgroundColor = groupColors[primaryGroup];
+    primaryTag.textContent = primaryGroup;
+    primaryTag.draggable = true;
+
+    primaryTag.ondragstart = (e) => {
+      e.dataTransfer.setData("text/plain", primaryGroup);
+      e.dataTransfer.dropEffect = "move";
+    };
+
+    primaryDropZone.appendChild(primaryTag);
+    primaryDropZone.classList.remove("empty");
+  } else {
+    primaryDropZone.textContent = "Drop a group here to set as primary";
+    primaryDropZone.classList.add("empty");
+  }
+
+  // Display all groups except the primary group in container
   groups.forEach(group => {
-    const tag = document.createElement("span");
-    const isSelected = selectedGroups.has(group.name);
-    tag.className = `group-tag ${group.name === primaryGroup ? 'primary' : ''} ${isSelected ? 'selected' : ''}`;
-    tag.style.backgroundColor = group.color;
-    tag.textContent = group.name;
-    tag.onclick = () => toggleGroup(group.name);
-    groupsContainer.appendChild(tag);
+    if (group.name !== primaryGroup) { // Only add non-primary groups here
+      const tag = document.createElement("span");
+      const isSelected = selectedGroups.has(group.name);
+      tag.className = `group-tag ${isSelected ? 'selected' : ''}`;
+      tag.style.backgroundColor = group.color;
+      tag.textContent = group.name;
+      tag.draggable = true;
+      tag.onclick = () => toggleGroup(group.name);
+
+      tag.ondragstart = (e) => {
+        e.dataTransfer.setData("text/plain", group.name);
+        e.dataTransfer.dropEffect = "move";
+      };
+
+      groupsContainer.appendChild(tag);
+    }
   });
+
+  // Handle drop zone events
+  primaryDropZone.ondragover = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  primaryDropZone.ondrop = (e) => {
+    e.preventDefault();
+    const groupName = e.dataTransfer.getData("text/plain");
+    const draggedGroup = groups.find(g => g.name === groupName);
+    if (draggedGroup && groupName !== primaryGroup) {
+      primaryGroup = groupName;
+      selectedGroups.add(groupName);
+      updateGroupDisplay();
+    }
+  };
+
+  // Handle drop back to groups container
+  groupsContainer.ondragover = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  groupsContainer.ondrop = (e) => {
+    e.preventDefault();
+    const groupName = e.dataTransfer.getData("text/plain");
+    if (groupName === primaryGroup) {
+      primaryGroup = selectedGroups.size > 1 ? [...selectedGroups].find(g => g !== groupName) : null;
+      updateGroupDisplay();
+    }
+  };
 };
 
 // Modified renderGuestList
@@ -139,7 +204,7 @@ document.getElementById("guestForm").addEventListener("submit", async (e) => {
       document.getElementById("result").textContent = "Guest added successfully!";
       document.getElementById("name").value = "";
       document.getElementById("phone").value = "";
-      selectedGroups.clear(); // Clear selections after successful add
+      selectedGroups.clear();
       primaryGroup = null;
       updateGroupDisplay();
       renderGuestList();

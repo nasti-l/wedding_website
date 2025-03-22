@@ -152,6 +152,32 @@ th, td {
     opacity: 0.6;
 }
 
+#primaryDropZone {
+    border: 2px dashed #666;
+    padding: 10px;
+    min-height: 40px;
+    margin: 10px 0;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#primaryDropZone.empty {
+    /* Maintain same styles when empty */
+}
+
+#primaryDropZone:not(.empty) {
+    border: 2px dashed #666; /* Keep dashed border when occupied */
+}
+
+#primaryDropZone.dragover {
+    background-color: #e0e0e0;
+}
+
 .group-tag.primary {
     font-weight: bold;
+    width: calc(100% - 20px); /* Account for padding */
+    text-align: center;
+    margin: 0 auto;
 }
