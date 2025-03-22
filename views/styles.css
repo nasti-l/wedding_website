@@ -48,7 +48,7 @@ h4 {
 .group-tag {
     display: inline-block;
     background-color: #FFDAB9; /* Pastel peach */
-    color: #333;
+    color: white;  /* Font color for group tags */
     padding: 5px 10px;
     margin-right: 5px;
     margin-bottom: 5px;
@@ -60,10 +60,8 @@ h4 {
 }
 
 .group-tag.primary {
-    background-color: #FFB6C1; /* Pastel pink */
     font-weight: bold;
-    border: 2px solid transparent;
-    border-color: #ff80a5;
+    border: 2px solid #FFD700; /* Visual cue for primary group */
 }
 
 .group-tag:hover {
@@ -119,14 +117,6 @@ th, td {
     border-bottom: 1px solid #ddd;
 }
 
-.group-tag {
-    padding: 5px 10px;
-    margin: 2px;
-    border-radius: 12px;
-    color: white;
-    font-size: 0.9rem;
-}
-
 .primary-group-tag {
     font-weight: bold;
     border: 1px solid white;
@@ -144,4 +134,24 @@ th, td {
 
 .delete-btn:hover {
     background-color: #c0392b;
+}
+.group-tag {
+    padding: 4px 8px;
+    margin: 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.group-tag.selected {
+    border: 2px solid #f9ff39;
+    opacity: 1;
+}
+
+.group-tag:not(.selected) {
+    opacity: 0.6;
+}
+
+.group-tag.primary {
+    font-weight: bold;
 }
