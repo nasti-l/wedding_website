@@ -24,8 +24,6 @@ const formatPhoneNumber = (phone) => {
 const sendWhatsAppMessage = async (phone, message) => {
     try {
         const formatted = formatPhoneNumber(phone);
-        const url = `https://web.whatsapp.com/send?phone=${formatted}`;
-
         const browser = await puppeteer.launch({
             headless: true, // Change to false for opened browser
             userDataDir: "./whatsapp-session",
@@ -33,33 +31,28 @@ const sendWhatsAppMessage = async (phone, message) => {
         });
 
         const page = await browser.newPage();
+        await page.setRequestInterception(true);
+        page.on("request", (req) => {
+            const resource = req.resourceType();
+            if (["image", "stylesheet", "font"].includes(resource)) {
+                req.abort();
+            } else {
+                req.continue();
+            }
+        });// Remove for opened browser
 
         await page.setUserAgent(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
             "(KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36"
         );
 
-        await page.goto(url, { waitUntil: "networkidle2" });
+        const url = `https://web.whatsapp.com/send?phone=${formatted}&text=${encodeURIComponent(message)}`;
+        await page.goto(url, { waitUntil: 'domcontentloaded' });
 
-        // Wait for chat box or retry if it doesn't show up
-        await page.waitForSelector("[aria-label='Type a message']", { timeout: 30000 });
-        const messageBox = await page.$("[aria-label='Type a message']");
-
-        if (!messageBox) {
-            throw new Error("Message input not found.");
-        }
-
-        await messageBox.click({ clickCount: 2 }); // ensure focused + selected
-        await page.evaluate(() => {
-            const input = document.querySelector("[aria-label='Type a message']");
-            input.innerText = ''; // Clear prefill via DOM
-        });
-        await page.keyboard.type(message);
+        await page.waitForSelector("[aria-label='Type a message']", { timeout: 10000 });
         await page.keyboard.press("Enter");
 
-
-        // Optional confirmation wait
-        await new Promise(resolve => setTimeout(resolve, 2000)); // safe delay
+        await new Promise(res => setTimeout(res, 1000));
         await browser.close();
 
         console.log(`✅ Message sent to ${formatted}`);
