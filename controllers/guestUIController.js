@@ -159,7 +159,7 @@ const renderGuestList = async () => {
   const guestList = document.getElementById("guestList");
   guestList.innerHTML = "";
 
-  guests.forEach(guest => {
+  guests.forEach((guest, index) => {
     const primaryGroupId = guest.primary_group_id;
     const primaryGroupObj = guest.groups.find(g => g.id === primaryGroupId);
     const primaryGroupName = primaryGroupObj ? primaryGroupObj.name : "";
@@ -178,7 +178,7 @@ const renderGuestList = async () => {
 
     const row = document.createElement("tr");
     row.innerHTML = `        
-      <td>${guest.id}</td>
+      <td>${index + 1}</td>
       <td>${guest.name}</td>
       <td>${guest.phone}</td>
       <td>${groupHTML}</td>
