@@ -46,4 +46,23 @@ const deleteGuestById = async (id) => {
   return result.rowCount > 0;
 };
 
-module.exports = { addGuest, getAllGuests, deleteGuestById };
+const markGuestAsInvited = async (id) => {
+  const result = await db.query("UPDATE guests SET status = 'Invited' WHERE id = $1 RETURNING name, phone", [id]);
+  return result.rows[0]; // undefined if not found
+};
+
+const getGuestById = async (id) => {
+  const result = await db.query(
+      "SELECT id, name, phone FROM guests WHERE id = $1",
+      [id]
+  );
+  return result.rows[0]; // Will be undefined if not found
+};
+
+module.exports = {
+  addGuest,
+  getAllGuests,
+  deleteGuestById,
+  markGuestAsInvited,
+  getGuestById, // ← add here too
+};

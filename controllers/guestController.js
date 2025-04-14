@@ -1,4 +1,26 @@
-const { addGuest, getAllGuests, deleteGuestById } = require("../models/guestModel");
+const { addGuest, getAllGuests, deleteGuestById, markGuestAsInvited, getGuestById } = require("../models/guestModel");
+const { sendWhatsAppMessage } = require("../utils/whatsappSender");
+
+const inviteGuest = async (req, res) => {
+  try {
+    const guestId = parseInt(req.params.id);
+    if (isNaN(guestId)) return res.status(400).json({ error: "Invalid ID" });
+
+    const guest = await markGuestAsInvited(guestId);
+    if (!guest) return res.status(404).json({ error: "Guest not found" });
+
+    const message = `Hi ${guest.name}, you are invited to our wedding! 🎉`;
+    const sent = await sendWhatsAppMessage(guest.phone, message);
+
+    if (!sent) return res.status(500).json({ error: "Failed to send WhatsApp message" });
+
+    res.json({ message: "Guest invited successfully" });
+  } catch (error) {
+    console.error("Error inviting guest:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 
 const createGuest = async (req, res) => {
   try {
@@ -48,4 +70,25 @@ const removeGuest = async (req, res) => {
   }
 };
 
-module.exports = { createGuest, getGuests, removeGuest };
+const fetchGuestById = async (req, res) => {
+  const guestId = parseInt(req.params.id);
+  if (isNaN(guestId)) return res.status(400).json({ error: "Invalid ID" });
+
+  try {
+    const guest = await getGuestById(guestId);
+    if (!guest) return res.status(404).json({ error: "Guest not found" });
+
+    res.json(guest);
+  } catch (error) {
+    console.error("Error fetching guest:", error);
+    res.status(500).json({ error: "Failed to fetch guest" });
+  }
+};
+
+module.exports = {
+  createGuest,
+  getGuests,
+  removeGuest,
+  inviteGuest,
+  fetchGuestById, // ← export the clean one
+};

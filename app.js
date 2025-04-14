@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const guestRoutes = require('./routes/guestRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const whatsappRoutes = require("./routes/whatsappRoutes");
 const path = require('path');
 require("dotenv").config();
 
@@ -12,10 +13,8 @@ app.use(express.static('./'));
 // Middleware to parse JSON payloads
 app.use(bodyParser.json());
 
-// Serve the admin page (via route)
+app.use("/api/whatsapp", whatsappRoutes);
 app.use('/admin', adminRoutes);
-
-// API routes
 app.use('/api/guests', guestRoutes);
 
 // Redirect `/` to `/admin`

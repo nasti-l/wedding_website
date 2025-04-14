@@ -183,8 +183,15 @@ const renderGuestList = async () => {
       <td>${guest.phone}</td>
       <td>${groupHTML}</td>
       <td>${guest.status}</td>
-      <td><button class="delete-btn" onclick="deleteGuest(${guest.id})">Delete</button></td>
-    `;
+      <td>
+        <button class="icon-btn" onclick="inviteGuest(${guest.id})">
+        <i class="fa-solid fa-envelope"></i>
+        </button>
+        <button class="whatsapp-icon-btn" onclick="openManualWhatsApp(${guest.id})">
+        <i class="fab fa-whatsapp"></i>
+        </button>
+          <button class="delete-btn" onclick="deleteGuest(${guest.id})">Delete</button>
+      </td>    `;
     guestList.appendChild(row);
   });
 };
@@ -266,6 +273,42 @@ const deleteGuest = async (id) => {
     alert("Failed to delete guest");
   }
 };
+
+const inviteGuest = async (id) => {
+  if (!confirm("Send a WhatsApp invite to this guest?")) return;
+
+  try {
+    const response = await fetch(`/api/guests/${id}/invite`, {
+      method: "POST"
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert("Invitation sent!");
+      renderGuestList(); // Refresh the table to show updated status
+    } else {
+      alert(`Error: ${result.error}`);
+    }
+  } catch (error) {
+    console.error("Error sending invite:", error);
+    alert("Failed to send invite");
+  }
+};
+
+const openManualWhatsApp = async (id) => {
+  try {
+    const response = await fetch(`/api/whatsapp/${id}/whatsapp-link`);
+    const guest = await response.json();
+
+    const link = `/api/whatsapp/${id}/whatsapp-link`;
+    const { url } = await (await fetch(link)).json();
+    window.open(url, "_blank");
+  } catch (error) {
+    console.error("Failed to open manual WhatsApp:", error);
+  }
+};
+
 
 // Load data when page loads
 window.onload = () => {
