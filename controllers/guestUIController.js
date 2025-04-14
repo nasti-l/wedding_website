@@ -207,8 +207,12 @@ document.getElementById("guestForm").addEventListener("submit", async (e) => {
   }
 
   const groupIds = groups.filter(g => selectedGroups.has(g.name)).map(g => g.id);
+  if (!primaryGroup) {
+    alert("Please select a primary group by dragging one into the drop zone.");
+    return;
+  }
   const primaryGroupObj = groups.find(g => g.name === primaryGroup);
-  const primaryGroupId = primaryGroupObj ? primaryGroupObj.id : groupIds[0];
+  const primaryGroupId = primaryGroupObj.id;
 
   try {
     const response = await fetch("/api/guests", {
