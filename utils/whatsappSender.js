@@ -27,7 +27,7 @@ const sendWhatsAppMessage = async (phone, message) => {
         const url = `https://web.whatsapp.com/send?phone=${formatted}`;
 
         const browser = await puppeteer.launch({
-            headless: false,
+            headless: true, // Change to false for opened browser
             userDataDir: "./whatsapp-session",
             args: ['--no-sandbox']
         });
