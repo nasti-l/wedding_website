@@ -54,7 +54,7 @@ const sendWhatsAppMessage = async (phone, message) => {
             const input = document.querySelector("[aria-label='Type a message']");
             input.innerText = ''; // Clear prefill via DOM
         });
-        await page.keyboard.type(message, { delay: 30 });
+        await page.keyboard.type(message);
         await page.keyboard.press("Enter");
 
 
