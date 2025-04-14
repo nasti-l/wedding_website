@@ -1,18 +1,15 @@
-const { addGuest, getAllGuests, deleteGuestById, markGuestAsInvited, getGuestById } = require("../models/guestModel");
-const { sendWhatsAppMessage } = require("../utils/whatsappSender");
+const { addGuest, getAllGuests, deleteGuestById, getGuestById } = require("../models/guestModel");
+const { inviteAndNotifyGuest } = require("../services/inviteService");
 
 const inviteGuest = async (req, res) => {
   try {
     const guestId = parseInt(req.params.id);
     if (isNaN(guestId)) return res.status(400).json({ error: "Invalid ID" });
 
-    const guest = await markGuestAsInvited(guestId);
-    if (!guest) return res.status(404).json({ error: "Guest not found" });
-
-    const message = `Hi ${guest.name}, you are invited to our wedding! 🎉`;
-    const sent = await sendWhatsAppMessage(guest.phone, message);
-
-    if (!sent) return res.status(500).json({ error: "Failed to send WhatsApp message" });
+    const result = await inviteAndNotifyGuest(guestId);
+    if (!result.success) {
+      return res.status(result.status || 500).json({ error: result.error });
+    }
 
     res.json({ message: "Guest invited successfully" });
   } catch (error) {
@@ -90,5 +87,5 @@ module.exports = {
   getGuests,
   removeGuest,
   inviteGuest,
-  fetchGuestById, // ← export the clean one
+  fetchGuestById,
 };

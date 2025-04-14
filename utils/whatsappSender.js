@@ -67,7 +67,8 @@ const sendWhatsAppMessage = async (phone, message) => {
 
 const openManualWhatsAppChat = (phone, message) => {
     const formatted = formatPhoneNumber(phone);
-    return `https://wa.me/${formatted}?text=${encodeURIComponent(message)}`;
+    return `https://web.whatsapp.com/send?phone=${formatted}&text=${encodeURIComponent(message)}`;
 };
+
 
 module.exports = { sendWhatsAppMessage, openManualWhatsAppChat };
